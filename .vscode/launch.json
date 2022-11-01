@@ -1,0 +1,12 @@
+{
+    "configurations": [
+        {
+            "name": "Run: Debug",
+            "request": "launch",
+            "type": "dart",
+            "args": [
+                "--debug"
+            ]
+        }
+    ]
+}
