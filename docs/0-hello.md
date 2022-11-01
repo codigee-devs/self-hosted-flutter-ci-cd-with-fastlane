@@ -1,7 +1,7 @@
 # 0 - Hello
 ![](img/logo.png)
 
-## Main actions in step
+## Actions
 - Creating and connecting Github repository
 - Initializing bare Flutter project
 
