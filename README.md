@@ -19,4 +19,4 @@ The main branch is the final result.
 
 ## Step by step
 1.  [Hello](/docs/0-hello.md)
-
+1.  [API Keys and ENV variables](/docs/1-api-keys-and-env-variables.md)
