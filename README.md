@@ -22,3 +22,4 @@ The main branch is the final result.
 2.  [API Keys and ENV variables](/docs/1-api-keys-and-env-variables.md)
 3.  [Flavors and build settings](/docs/2-flavors-and-build-settings.md)
 4.  [Fastlane](/docs/3-fastlane.md)
+5.  [Github workflows and scripts](/docs/4-github-workflows-scripts.md)

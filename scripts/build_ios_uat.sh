@@ -1,0 +1,1 @@
+bundle exec fastlane ios deploy_uat
