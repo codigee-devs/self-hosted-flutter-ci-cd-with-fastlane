@@ -1,12 +1,49 @@
 {
     "configurations": [
         {
-            "name": "Run: Debug",
+            "name": "Run UAT with UAT ENV",
             "request": "launch",
             "type": "dart",
             "args": [
-                "--debug"
+                "--flavor",
+                "uat",
+                "--dart-define",
+                "ENV=uat"
             ]
-        }
+        },
+        {
+            "name": "Run UAT with PROD ENV",
+            "request": "launch",
+            "type": "dart",
+            "args": [
+                "--flavor",
+                "uat",
+                "--dart-define",
+                "ENV=prod"
+            ]
+        },
+        {
+            "name": "Run PROD with UAT ENV",
+            "request": "launch",
+            "type": "dart",
+            "args": [
+                "--flavor",
+                "prod",
+                "--dart-define",
+                "ENV=uat"
+            ]
+        },
+        {
+            "name": "Run PROD with PROD ENV",
+            "request": "launch",
+            "type": "dart",
+            "args": [
+                "--flavor",
+                "prod",
+                "--dart-define",
+                "ENV=prod"
+            ]
+        },
+        
     ]
 }

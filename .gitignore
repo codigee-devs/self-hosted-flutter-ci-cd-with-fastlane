@@ -19,3 +19,10 @@ doc/api/
 *.js_
 *.js.deps
 *.js.map
+
+# Certificates
+*_key.p8
+*_key.json
+
+# config/
+*_config.json

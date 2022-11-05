@@ -1,4 +1,4 @@
-package com.example.self_hosted_cicd
+package com.codigee.selfhostedcicd.uat
 
 import io.flutter.embedding.android.FlutterActivity
 
