@@ -44,7 +44,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.codigee.selfhostedcicd.prod"
+        applicationId "com.codigee.selfhostedcicdwithfastlane.prod"
         minSdkVersion 20
         targetSdkVersion 31
         multiDexEnabled true
@@ -81,13 +81,13 @@ android {
         uat {
             dimension "app"
             resValue "string", "app_name", "Selfhosted CICD Uat"
-            applicationId "com.codigee.selfhostedcicd.uat"
+            applicationId "com.codigee.selfhostedcicdwithfastlane.uat"
         }
 
         prod {
             dimension "app"
             resValue "string", "app_name", "Selfhosted CICD Prod"
-            applicationId "com.codigee.selfhostedcicd.prod"
+            applicationId "com.codigee.selfhostedcicdwithfastlane.prod"
         }
     }
 }

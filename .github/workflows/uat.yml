@@ -1,11 +1,13 @@
-name: Deploy Prod
+name: Deploy UAT
 on:
+  push:
+    tags: [ '*' ]
   workflow_dispatch:
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 jobs:
-  deploy-prod:
+  deploy-uat:
     defaults:
       run:
         working-directory: ./${{ github.workflow }}/${{ github.ref }}
@@ -14,16 +16,26 @@ jobs:
     env:
       ANDROID_KEY_PROPERTIES: ${{ secrets.ANDROID_KEY_PROPERTIES }}
       ANDROID_KEYSTORE: ${{ secrets.ANDROID_KEYSTORE }}
+      APP_APPSTORE_ID_PROD: ${{ secrets.APP_APPSTORE_ID_PROD }}
+      APP_APPSTORE_ID_UAT: ${{ secrets.APP_APPSTORE_ID_UAT }}
+      APP_BUNDLE_ID_PROD: ${{ secrets.APP_BUNDLE_ID_PROD }}
+      APP_BUNDLE_ID_UAT: ${{ secrets.APP_BUNDLE_ID_UAT }}
       APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
       APP_STORE_CONNECT_KEY_IDENTIFIER: ${{ secrets.APP_STORE_CONNECT_KEY_IDENTIFIER }}
       APP_STORE_CONNECT_KEY: ${{ secrets.APP_STORE_CONNECT_KEY }}
+      APPLE_CERTIFICATES_REPOSITORY_URL: ${{ secrets.APPLE_CERTIFICATES_REPOSITORY_URL }}
+      APPLE_ID: ${{ secrets.APPLE_ID }}
+      APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
       GOOGLE_CONSOLE_API_KEY_JSON: ${{ secrets.GOOGLE_CONSOLE_API_KEY_JSON }}
+      IS_RUNNING_ON_CI: ${{ secrets.IS_RUNNING_ON_CI }}
+      KEYCHAIN_NAME: ${{ secrets.KEYCHAIN_NAME }}
+      KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
       LANG: en_US.UTF-8
       LC_ALL: en_US.UTF-8
       MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
-      PROD_CONFIG_JSON: ${{ secrets.PROD_CONFIG_JSON }}
       PUB_CACHE: ./.pub-cache
       SSH_KEY: ${{ secrets.SSH_KEY }}
+      UAT_CONFIG_JSON: ${{ secrets.UAT_CONFIG_JSON }}
     steps:
       - name: Clean up
         run: rm -rf ./${{ github.workflow }}/${{ github.ref }}/*
@@ -39,7 +51,7 @@ jobs:
           echo $ANDROID_KEY_PROPERTIES | base64 --decode > android/key.properties
           echo $ANDROID_KEYSTORE | base64 --decode > android/app/key.keystore
           echo $APP_STORE_CONNECT_KEY | base64 --decode > apple_console_api_key.p8
-          echo $GOOGLE_CONSOLE_API_KEY_JSON > base64 --decode > google_console_api_key.json
+          echo $GOOGLE_CONSOLE_API_KEY_JSON > google_console_api_key.json
           echo $UAT_CONFIG_JSON > config/uat_config.json
       - name: Setup
         run: |
@@ -60,14 +72,14 @@ jobs:
         run: flutter analyze
       - name: setup keychain
         run: bundle exec fastlane setup_keychain
-      - name: build ios prod
-        run: sh ci/build_ios_prod.sh
-      - name: build android prod
-        run: sh ci/build_android_prod.sh
+      - name: build ios uat
+        run: sh scripts/build_ios_uat.sh
+      - name: build android uat
+        run: sh scripts/build_android_uat.sh
       - name: Archive artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: prod-artifacts
+          name: uat-artifacts
           path: |
             ./*.dSYM.zip
             ./*.ipa
@@ -78,4 +90,3 @@ jobs:
             build/ios/ipa/*.dSYM.zip
             build/ios/ipa/*.ipa
             flutter_drive.log
-            

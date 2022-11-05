@@ -10,7 +10,7 @@ APPLE_CERTIFICATES_REPOSITORY_URL = ENV['APPLE_CERTIFICATES_REPOSITORY_URL']
 APPLE_ID = ENV['APPLE_ID'].to_s
 APPLE_TEAM_ID = ENV['APPLE_TEAM_ID']
 BUILD_NUMBER = ENV['GITHUB_RUN_NUMBER'].to_i
-GITHUB_SSH_KEY = ENV['GITHUB_SSH_KEY']
+SSH_KEY = ENV['SSH_KEY']
 IS_RUNNING_ON_CI = ENV['IS_RUNNING_ON_CI'].to_s.downcase == 'true'
 KEYCHAIN_NAME = ENV['KEYCHAIN_NAME']
 KEYCHAIN_PASSWORD = ENV['KEYCHAIN_PASSWORD']
@@ -118,7 +118,7 @@ platform :ios do
     common_flutter_actions
     
     Dir.chdir ".." do
-      sh("flutter", "build", "ios", "--release", "--no-codesign", "--flavor", "uat", "--dart-define=ENV=uat")
+      sh("flutter", "build", "ios", "--build-number=#{BUILD_NUMBER}", "--release", "--no-codesign", "--flavor", "uat", "--dart-define=ENV=uat")
     end
 
     remove_old_profiles_uat
@@ -127,12 +127,12 @@ platform :ios do
       api_key: api_key,
       app_identifier: APP_BUNDLE_ID_UAT,
       keychain_password: KEYCHAIN_PASSWORD,
-      readonly: RUNNING_ON_CI,
+      readonly: IS_RUNNING_ON_CI,
       type: 'appstore'
     )
 
     build_app(
-      configuration: "release-uat",
+      configuration: "Release-uat",
       export_method: "app-store",
       scheme: "uat",
       workspace: "ios/Runner.xcworkspace"
@@ -153,7 +153,7 @@ platform :ios do
     common_flutter_actions
 
     Dir.chdir ".." do
-      sh("flutter", "build", "ios", "--release", "--no-codesign", "--flavor", "prod", "--dart-define=ENV=prod")
+      sh("flutter", "build", "ios", "--build-number=#{BUILD_NUMBER}", "--release", "--no-codesign", "--flavor", "prod", "--dart-define=ENV=prod")
     end
 
     remove_old_profiles_prod
@@ -162,12 +162,12 @@ platform :ios do
       api_key: api_key,
       app_identifier: APP_BUNDLE_ID_PROD,
       keychain_password: KEYCHAIN_PASSWORD,
-      readonly: RUNNING_ON_CI,
+      readonly: IS_RUNNING_ON_CI,
       type: 'appstore'
     )
 
     build_app(
-      configuration: "release-prod",
+      configuration: "Release-prod",
       export_method: "app-store",
       scheme: "prod",
       workspace: "ios/Runner.xcworkspace"
@@ -197,7 +197,7 @@ platform :android do
 
     supply(
       aab: "build/app/outputs/bundle/uatRelease/app-uat-release.aab",
-      json_key: 'google_console_key.json', # CREATES ON RUN
+      json_key: 'google_console_api_key.json', # CREATES ON RUN
       package_name: APP_BUNDLE_ID_UAT,
       release_status: 'draft',
       skip_upload_images: true,
@@ -218,7 +218,7 @@ platform :android do
 
     supply(
       aab: "build/app/outputs/bundle/prodRelease/app-prod-release.aab",
-      json_key: 'google_console_key.json', # CREATES ON RUN
+      json_key: 'google_console_api_key.json', # CREATES ON RUN
       package_name: APP_BUNDLE_ID_PROD,
       release_status: 'draft',
       skip_upload_images: true,
