@@ -1,0 +1,82 @@
+name: Deploy UAT
+on:
+  push:
+    tags: [ '*' ]
+  workflow_dispatch:
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  deploy-uat:
+    defaults:
+      run:
+        working-directory: ./${{ github.workflow }}/${{ github.ref }}
+    runs-on: [ self-hosted ]
+    timeout-minutes: 60
+    env:
+      ANDROID_KEY_PROPERTIES: ${{ secrets.ANDROID_KEY_PROPERTIES }}
+      ANDROID_KEYSTORE: ${{ secrets.ANDROID_KEYSTORE }}
+      APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+      APP_STORE_CONNECT_KEY_IDENTIFIER: ${{ secrets.APP_STORE_CONNECT_KEY_IDENTIFIER }}
+      APP_STORE_CONNECT_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}
+      GOOGLE_CONSOLE_API_KEY_JSON: ${{ secrets.GOOGLE_CONSOLE_API_KEY_JSON }}
+      LANG: en_US.UTF-8
+      LC_ALL: en_US.UTF-8
+      MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+      PUB_CACHE: ./.pub-cache
+      SSH_KEY: ${{ secrets.SSH_KEY }}
+      UAT_CONFIG_JSON: ${{ secrets.UAT_CONFIG_JSON }}
+    steps:
+      - name: Clean up
+        run: rm -rf ./${{ github.workflow }}/${{ github.ref }}/*
+        working-directory: ./
+      - name: Check out
+        uses: actions/checkout@v3
+        with:
+          path: ${{ github.workflow }}/${{ github.ref }}
+      - name: Add configs
+        run: |
+          mkdir -p android
+          mkdir -p android/app
+          echo $ANDROID_KEY_PROPERTIES | base64 --decode > android/key.properties
+          echo $ANDROID_KEYSTORE | base64 --decode > android/app/key.keystore
+          echo $APP_STORE_CONNECT_KEY | base64 --decode > apple_console_api_key.p8
+          echo $GOOGLE_CONSOLE_API_KEY_JSON > base64 --decode > google_console_api_key.json
+          echo $UAT_CONFIG_JSON > config/uat_config.json
+      - name: Setup
+        run: |
+          bundle install
+          echo "flutter.sdk=$HOME/programs/flutter" > android/local.properties
+      - name: Show tool versions
+        run: |
+          bundle --version
+          bundle exec fastlane --version
+          flutter --version
+          pod --version
+          xcodebuild -version
+      - name: flutter common
+        run: bundle exec fastlane common_flutter_actions
+      - name: flutter test
+        run: flutter test
+      - name: flutter analyze
+        run: flutter analyze
+      - name: setup keychain
+        run: bundle exec fastlane setup_keychain
+      - name: build ios uat
+        run: sh ci/build_ios_uat.sh
+      - name: build android uat
+        run: sh ci/build_android_uat.sh
+      - name: Archive artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: uat-artifacts
+          path: |
+            ./*.dSYM.zip
+            ./*.ipa
+            /tmp/xcodebuild_logs/*.log
+            build/**/outputs/**/*.aab
+            build/**/outputs/**/*.apk
+            build/**/outputs/**/mapping.txt
+            build/ios/ipa/*.dSYM.zip
+            build/ios/ipa/*.ipa
+            flutter_drive.log
