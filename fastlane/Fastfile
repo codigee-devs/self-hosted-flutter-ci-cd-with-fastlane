@@ -1,0 +1,230 @@
+default_platform(:ios)
+
+APP_APPSTORE_ID_PROD = ENV['APP_APPSTORE_ID_PROD'].to_s
+APP_APPSTORE_ID_UAT = ENV['APP_APPSTORE_ID_UAT'].to_s
+APP_BUNDLE_ID_PROD = ENV['APP_BUNDLE_ID_PROD']
+APP_BUNDLE_ID_UAT = ENV['APP_BUNDLE_ID_UAT']
+APP_STORE_CONNECT_ISSUER_ID = ENV['APP_STORE_CONNECT_ISSUER_ID']
+APP_STORE_CONNECT_KEY_IDENTIFIER = ENV['APP_STORE_CONNECT_KEY_IDENTIFIER']
+APPLE_CERTIFICATES_REPOSITORY_URL = ENV['APPLE_CERTIFICATES_REPOSITORY_URL']
+APPLE_ID = ENV['APPLE_ID'].to_s
+APPLE_TEAM_ID = ENV['APPLE_TEAM_ID']
+BUILD_NUMBER = ENV['GITHUB_RUN_NUMBER'].to_i
+GITHUB_SSH_KEY = ENV['GITHUB_SSH_KEY']
+IS_RUNNING_ON_CI = ENV['IS_RUNNING_ON_CI'].to_s.downcase == 'true'
+KEYCHAIN_NAME = ENV['KEYCHAIN_NAME']
+KEYCHAIN_PASSWORD = ENV['KEYCHAIN_PASSWORD']
+MATCH_PASSWORD = ENV['MATCH_PASSWORD'].to_s;
+
+api_key = app_store_connect_api_key(
+    key_id: APP_STORE_CONNECT_KEY_IDENTIFIER,
+    issuer_id: APP_STORE_CONNECT_ISSUER_ID,
+    key_filepath: 'apple_console_api_key.p8', # CREATES ON RUN
+    in_house: false # optional but may be required if using match/sigh
+)
+
+# COMMON FLUTTER
+lane :common_flutter_actions do
+  Dir.chdir ".." do
+    sh("flutter", "clean")
+    sh("flutter", "pub", "get")
+    sh("flutter", "pub", "run", "build_runner", "build", "--delete-conflicting-outputs")
+  end
+end
+
+# IOS
+platform :ios do
+
+  # KEYCHAIN
+  lane :setup_keychain do
+    create_keychain(
+      default_keychain: false,
+      lock_when_sleeps: true,
+      name: KEYCHAIN_NAME,
+      password: KEYCHAIN_PASSWORD,
+      timeout: 3600,
+      unlock: true
+    )
+  end
+
+  # UAT PROFILES
+  lane :refresh_appstore_profiles_uat do
+    match(
+      api_key: api_key,
+      app_identifier: APP_BUNDLE_ID_UAT,
+      force_for_new_devices: true,
+      force: true,
+      keychain_password: KEYCHAIN_PASSWORD,
+      readonly: false,
+      type: 'appstore'
+    )
+  end
+    
+  lane :refresh_development_profiles_uat do
+    match(
+      api_key: api_key,
+      app_identifier: APP_BUNDLE_ID_UAT,
+      force_for_new_devices: true,
+      force: true,
+      keychain_password: KEYCHAIN_PASSWORD,
+      readonly: false,
+      type: 'development'
+    )
+  end
+
+  # PROD PROFILES
+  lane :refresh_appstore_profiles_prod do
+    match(
+      api_key: api_key,
+      app_identifier: APP_BUNDLE_ID_PROD,
+      force_for_new_devices: true,
+      force: true,
+      keychain_password: KEYCHAIN_PASSWORD,
+      readonly: false,
+      type: 'appstore'
+      )
+    end
+  
+  lane :refresh_development_profiles_prod do
+    match(
+      api_key: api_key,
+      app_identifier: APP_BUNDLE_ID_PROD,
+      force_for_new_devices: true,
+      force: true,
+      keychain_password: KEYCHAIN_PASSWORD,
+      readonly: false,
+      type: 'development'
+    )
+  end
+    
+  lane :refresh_all_profiles do
+    refresh_appstore_profiles_prod
+    refresh_appstore_profiles_uat
+    refresh_development_profiles_prod
+    refresh_development_profiles_uat
+  end
+
+  private_lane :remove_old_profiles_prod do
+    sh('fastlane sigh manage -p "#{APP_BUNDLE_ID_PROD}" --force')
+  end
+
+  private_lane :remove_old_profiles_uat do
+    sh('fastlane sigh manage -p "#{APP_BUNDLE_ID_UAT}" --force')
+  end
+
+  # APPSTORE CONNECT UAT
+  desc 'Build a UAT appstore version and distribute to AppStore Connect'
+  lane :deploy_uat do
+    common_flutter_actions
+    
+    Dir.chdir ".." do
+      sh("flutter", "build", "ios", "--release", "--no-codesign", "--flavor", "uat", "--dart-define=ENV=uat")
+    end
+
+    remove_old_profiles_uat
+    
+    match(
+      api_key: api_key,
+      app_identifier: APP_BUNDLE_ID_UAT,
+      keychain_password: KEYCHAIN_PASSWORD,
+      readonly: RUNNING_ON_CI,
+      type: 'appstore'
+    )
+
+    build_app(
+      configuration: "release-uat",
+      export_method: "app-store",
+      scheme: "uat",
+      workspace: "ios/Runner.xcworkspace"
+    )
+
+    pilot(
+      api_key: api_key,
+      apple_id: APP_APPSTORE_ID_UAT,
+      skip_submission: true,
+      skip_waiting_for_build_processing: true,
+      team_id: APPLE_TEAM_ID
+    )
+  end
+  
+  # APPSTORE CONNECT PROD
+  desc 'Build a PROD appstore version and distribute to AppStore Connect'
+  lane :deploy_prod do
+    common_flutter_actions
+
+    Dir.chdir ".." do
+      sh("flutter", "build", "ios", "--release", "--no-codesign", "--flavor", "prod", "--dart-define=ENV=prod")
+    end
+
+    remove_old_profiles_prod
+
+    match(
+      api_key: api_key,
+      app_identifier: APP_BUNDLE_ID_PROD,
+      keychain_password: KEYCHAIN_PASSWORD,
+      readonly: RUNNING_ON_CI,
+      type: 'appstore'
+    )
+
+    build_app(
+      configuration: "release-prod",
+      export_method: "app-store",
+      scheme: "prod",
+      workspace: "ios/Runner.xcworkspace"
+    )
+
+    pilot(
+      api_key: api_key,
+      apple_id: APP_APPSTORE_ID_PROD,
+      skip_submission: true,
+      skip_waiting_for_build_processing: true,
+      team_id: APPLE_TEAM_ID
+    )
+  end
+end
+
+# ANDROID
+platform :android do
+
+  # PLAYSTORE UAT
+  desc 'Build a UAT playstore version and distribute'
+  lane :deploy_uat do
+    common_flutter_actions
+    
+    Dir.chdir ".." do
+      sh("flutter", "build", "appbundle", "--build-number=#{BUILD_NUMBER}", "--flavor", "uat", "--dart-define=ENV=uat")
+    end
+
+    supply(
+      aab: "build/app/outputs/bundle/uatRelease/app-uat-release.aab",
+      json_key: 'google_console_key.json', # CREATES ON RUN
+      package_name: APP_BUNDLE_ID_UAT,
+      release_status: 'draft',
+      skip_upload_images: true,
+      skip_upload_metadata: true,
+      skip_upload_screenshots: true,
+      track: 'internal'
+    )
+  end
+
+  # PLAYSTORE PROD
+  desc 'Build a PROD playstore version and distribute'
+  lane :deploy_prod do
+    common_flutter_actions
+
+    Dir.chdir ".." do
+      sh("flutter", "build", "appbundle", "--build-number=#{BUILD_NUMBER}", "--flavor", "prod", "--dart-define=ENV=prod")
+    end
+
+    supply(
+      aab: "build/app/outputs/bundle/prodRelease/app-prod-release.aab",
+      json_key: 'google_console_key.json', # CREATES ON RUN
+      package_name: APP_BUNDLE_ID_PROD,
+      release_status: 'draft',
+      skip_upload_images: true,
+      skip_upload_metadata: true,
+      skip_upload_screenshots: true,
+      track: 'internal'
+    )
+  end
+end

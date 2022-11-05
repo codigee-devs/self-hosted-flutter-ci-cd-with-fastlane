@@ -21,3 +21,4 @@ The main branch is the final result.
 1.  [Hello](/docs/0-hello.md)
 2.  [API Keys and ENV variables](/docs/1-api-keys-and-env-variables.md)
 3.  [Flavors and build settings](/docs/2-flavors-and-build-settings.md)
+4.  [Fastlane](/docs/3-fastlane.md)

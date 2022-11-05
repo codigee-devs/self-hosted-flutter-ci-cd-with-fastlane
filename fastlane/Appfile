@@ -1,0 +1,20 @@
+APP_BUNDLE_ID_PROD =  ENV['APP_BUNDLE_ID_PROD']
+APP_BUNDLE_ID_UAT =  ENV['APP_BUNDLE_ID_UAT']
+APPLE_ID = ENV['APPLE_ID'].to_s
+APPLE_TEAM_ID = ENV['APPLE_TEAM_ID']
+
+app_identifier(APP_BUNDLE_ID_UAT)
+apple_id(APPLE_ID)
+team_id(APPLE_TEAM_ID)
+
+for_platform :android do
+  for_lane :deploy_prod do
+    app_identifier APP_BUNDLE_ID_PROD
+  end
+end
+
+for_platform :ios do
+  for_lane :deploy_prod do
+    app_identifier APP_BUNDLE_ID_UAT
+  end
+end
