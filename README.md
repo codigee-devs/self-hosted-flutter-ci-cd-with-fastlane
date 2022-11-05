@@ -23,3 +23,4 @@ The main branch is the final result.
 3.  [Flavors and build settings](/docs/2-flavors-and-build-settings.md)
 4.  [Fastlane](/docs/3-fastlane.md)
 5.  [Github workflows and scripts](/docs/4-github-workflows-scripts.md)
+6.  [Github Selfhosted runner](/docs/5-github-selfhosted-runner.md)
