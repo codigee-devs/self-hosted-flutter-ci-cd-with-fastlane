@@ -1,4 +1,4 @@
-package com.codigee.selfhostedcicd.uat
+package com.codigee.selfhostedcicdwithfastlane.uat
 
 import io.flutter.embedding.android.FlutterActivity
 
