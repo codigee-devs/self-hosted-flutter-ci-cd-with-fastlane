@@ -26,6 +26,7 @@ To see implementation step-by-step check branches.
 ## Step by step
 1.  Hello. [doc](/docs/0-hello.md) [branch](https://github.com/codigee-devs/self-hosted-flutter-ci-cd-with-fastlane/tree/0-Hello!)
 2.  API Keys and ENV variables. [doc](/docs/1-api-keys-and-env-variables.md) [branch](https://github.com/codigee-devs/self-hosted-flutter-ci-cd-with-fastlane/tree/1-api-keys-and-env-variables)
+3. Flavors and build settings [doc](/docs/2-flavors-and-build-settings.md) [branch](https://github.com/codigee-devs/self-hosted-flutter-ci-cd-with-fastlane/tree/2-flavors-build-settings)
 
 ## Flow
 ![](docs/img/flow.png)
