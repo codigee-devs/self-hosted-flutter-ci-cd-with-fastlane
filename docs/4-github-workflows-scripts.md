@@ -1,4 +1,4 @@
-# 4 - github Workflows and scripts
+# 4 - Github Workflows and scripts
 ![](img/logo.png)
 
 ## Actions
@@ -6,4 +6,4 @@
 - Adding build scripts using fastlane
 
 ## Description
-
+Workflows [tutorial](https://docs.github.com/en/actions/using-workflows)
