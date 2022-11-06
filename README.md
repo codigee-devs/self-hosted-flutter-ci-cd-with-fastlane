@@ -30,6 +30,8 @@ To see implementation step-by-step check branches.
 4. Fastlane [doc](/docs/3-fastlane.md) [branch](https://github.com/codigee-devs/self-hosted-flutter-ci-cd-with-fastlane/tree/3-fastlane)
 5. Github workflows and scripts [docs](/docs/4-github-workflows-scripts.md) [branch](https://github.com/codigee-devs/self-hosted-flutter-ci-cd-with-fastlane/tree/4-github-workflows/fastlane)
 6. Github Selfhosted runner [docs](/docs/5-github-selfhosted-runner.md) [branch](https://github.com/codigee-devs/self-hosted-flutter-ci-cd-with-fastlane/tree/5-github-selfhosted-runner)
-6. Configure Match repository [docs](/docs/6-configuring-match-repository.md) [branch](https://github.com/codigee-devs/self-hosted-flutter-ci-cd-with-fastlane/tree/6-configure-match-repository)
+7. Configure Match repository [docs](/docs/6-configuring-match-repository.md) [branch](https://github.com/codigee-devs/self-hosted-flutter-ci-cd-with-fastlane/tree/6-configure-match-repository)
+8. Upload Android build manually [docs](/docs/7-upload-android-build-manually.md) [branch](https://github.com/codigee-devs/self-hosted-flutter-ci-cd-with-fastlane/tree/7-upload-android-build-manually)
+
 ## Flow
 ![](docs/img/flow.png)

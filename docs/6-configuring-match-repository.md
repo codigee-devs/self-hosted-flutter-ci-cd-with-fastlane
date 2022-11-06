@@ -1,4 +1,4 @@
-# 5 - Configuring Match repository
+# 6 - Configuring Match repository
 ![](img/logo.png)
 
 ## Actions
