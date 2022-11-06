@@ -35,3 +35,6 @@ To see implementation step-by-step check branches.
 
 ## Flow
 ![](docs/img/flow.png)
+
+## QR
+![](docs/img/qr.png)
