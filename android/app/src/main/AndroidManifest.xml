@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.codigee.selfhostedcicd.uat">
+    package="com.codigee.selfhostedcicdwithfastlane.uat">
    <application
         android:label="self_hosted_cicd"
         android:name="${applicationName}"
