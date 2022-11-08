@@ -1,8 +1,8 @@
-# 1 - Prepare API keys, additional repositories and ENV variables
+# 1 - API Keys and ENV variables
 ![](img/logo.png)
 
 ## Actions
-- Creating match repository
+- Creating Match repository
 - Gathering required credentials and files
 - Adding them to repository secrets
 
@@ -10,7 +10,7 @@
 ## Description
 
 ### Creating match repository
-Create just an empty, private Github repository. It will be used in further steps by [Fastlane](https://docs.fastlane.tools/actions/match/). It stores Apple's certifactes for signing apps.
+Create just an empty, private Github repository. It will be used in further steps by Fastlane [Match](https://docs.fastlane.tools/actions/match/). It stores Apple's certifactes for signing apps.
 
 ---
 
@@ -29,14 +29,21 @@ Variables to add:
 <i>Keystore file for signing the app. [App Signing](https://developer.android.com/studio/publish/app-signing).
 Example:</i>
 ```
-Encode retrieved file: your.keystore
+Encode retrieved file: key.keystore
 ```
 
 #### <B>ANDROID_KEY_PROPERTIES*</b>
 <i>Key properties file for signing the app. [Key Properties](https://stackoverflow.com/questions/20562189/sign-apk-without-putting-keystore-info-in-build-gradle).
 Example:</i>
 ```
-Encode retrieved file: key.properties
+Encode retrieved file: key.properties. 
+File itself(storeFile is up to your keystore file's name):
+
+storePassword=keystorePassword
+keyPassword=keystorePassword
+keyAlias=key
+storeFile=key.keystore
+
 ```
 
 #### <B>APP_APPSTORE_ID_PROD</b>
@@ -112,7 +119,7 @@ Example:</i>
 012304DSAD
 ```
 
-#### <B>GITHUB_SSH_KEY</b>
+#### <B>SSH_KEY</b>
 <i>SSH key associated with your [Github account](https://docs.github.com/en/authentication/connecting-to-github-with-ssh).
 Example:</i>
 ```
@@ -122,6 +129,25 @@ XXX
 XXX
 gov9vGNg
 -----END PRIVATE KEY-----
+```
+
+#### <B>GOOGLE_CONSOLE_API_KEY_JSON</b>
+<i>Key linked to Google Console. [doc](https://intercom.help/appinstitute/en/articles/1025206-how-to-get-your-google-play-json-key)
+Example:</i>
+```
+{
+  "type": "service_account",
+  "project_id": "",
+  "private_key_id": "",
+  "private_key": "",
+  "client_email": "",
+  "client_id": "",
+  "auth_uri": "",
+  "token_uri": "",
+  "auth_provider_x509_cert_url": "",
+  "client_x509_cert_url": ""
+}
+
 ```
 
 #### <B>IS_RUNNING_ON_CI</b>
@@ -145,14 +171,14 @@ keychainPassword1234
 ```
 
 #### <B>MATCH_PASSWORD</b>
-<i> Password for futher use. </i>
+<i> Password for futher use. Match password is passed when cinitializing Match repository. </i>
 Example:</i>
 ```
 matchPassword1234
 ```
 
 #### <B>PROD_CONFIG_JSON</b>
-<i> JSON with your app environment configurations.
+<i> JSON with your app environment configurations. It's up to your app to handle content.
 Example:</i>
 ```
 {
@@ -161,7 +187,7 @@ Example:</i>
 ```
 
 #### <B>UAT_CONFIG_JSON</b>
-<i> JSON with your app environment configurations.
+<i> JSON with your app environment configurations. It's up to your app to handle content.
 Example:</i>
 ```
 {
@@ -170,3 +196,7 @@ Example:</i>
 ```
 
 DON'T COMMIT THESE FILES OR VARIABLES!
+
+
+### Adding new repository secrets
+[Tutorial](https://docs.github.com/en/actions/security-guides/encrypted-secrets)
